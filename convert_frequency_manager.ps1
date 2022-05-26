@@ -19,8 +19,8 @@ class FrequencyEntry
 {
     [string]$Name
     [string]$GroupName
-    [int]$Frequency
-    [int]$Bandwidth
+    [Int64]$Frequency
+    [Int64]$Bandwidth
     [string]$DetectorType
 }
 
