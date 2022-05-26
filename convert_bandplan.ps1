@@ -25,7 +25,7 @@ foreach ($entry in $entries_xml) {
     $new_entry.Stop= $entry.Node.maxFrequency;
 
     # just guessing at these, would be better to support a colour field like SDR#?
-    if ($entry.Node.InnerText.ToLower().Contains("ham") || $entry.Node.InnerText.ToLower().Contains("telegraphy"))
+<#     if ($entry.Node.InnerText.ToLower().Contains("ham") || $entry.Node.InnerText.ToLower().Contains("telegraphy"))
     {
         $new_entry.Type = "amateur";
     }
@@ -34,18 +34,40 @@ foreach ($entry in $entries_xml) {
     }
     else {
         $new_entry.Type = "broadcast";
-    }
+    } #>
 
     [void]$entires_objects.Add($new_entry);
     #echo $new_entry
 }
 
+# sort by frequency and change colour per object to avoid these big mono-colour blocks
+
+$entires_objects = $entires_objects | Sort-Object -Property Start;
+
+$entires_objects_coloured = New-Object System.Collections.ArrayList;
+$iterator = 0;
+foreach ($entry in $entires_objects)
+{
+    $new_entry = $entry;
+    if ($iterator -gt 2)
+    {
+        $iterator = 0;
+    }
+    switch ($iterator)   
+    {
+        0 {$new_entry.Type = "amateur"}
+        1 {$new_entry.Type = "military"}
+        2 {$new_entry.Type = "broadcast"}
+    }
+    $iterator++;
+
+    [void]$entires_objects_coloured.Add($new_entry);
+}
 
 $jsonBase = @{}
-$array = @{}
 $list = New-Object System.Collections.ArrayList
 
-foreach ($entry in $entires_objects)
+foreach ($entry in $entires_objects_coloured)
 {
     [void]$list.Add(@{"name"=$entry.Name;"type"=$entry.Type;"start"=$entry.Start;"end"=$entry.Stop});
 }
